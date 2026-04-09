@@ -1,0 +1,115 @@
+/* SiajForm.css */
+:root {
+  --siaj-blue: #12395B;
+  --siaj-green: #79B755;
+  --siaj-gold: #C4A052;
+}
+
+.siaj-form-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Novo Header Alinhado à Esquerda */
+.siaj-header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.siaj-logo-img {
+  height: 140px;
+  object-fit: contain;
+}
+
+.siaj-header-title {
+  color: var(--siaj-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+/* Grid System */
+.siaj-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.siaj-col-2 { grid-column: span 2; }
+.siaj-col-3 { grid-column: span 3; }
+.siaj-col-4 { grid-column: span 4; }
+.siaj-col-5 { grid-column: span 5; }
+.siaj-col-6 { grid-column: span 6; }
+.siaj-col-7 { grid-column: span 7; }
+.siaj-col-8 { grid-column: span 8; }
+.siaj-col-12 { grid-column: span 12; }
+
+@media (max-width: 768px) {
+  .siaj-grid > div { grid-column: span 12 !important; }
+}
+
+.siaj-field-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--siaj-blue);
+  font-size: 0.875rem;
+}
+
+.siaj-doc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  background-color: #f8fafc;
+}
+
+.siaj-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Customizações de Cor do PrimeReact para o SIAJ */
+.p-button.siaj-btn-primary {
+  background-color: var(--siaj-blue);
+  border-color: var(--siaj-blue);
+}
+.p-button.siaj-btn-primary:enabled:hover {
+  background-color: #0d2a45;
+  border-color: #0d2a45;
+}
+
+.p-button.siaj-btn-success {
+  background-color: var(--siaj-green);
+  border-color: var(--siaj-green);
+}
+.p-button.siaj-btn-success:enabled:hover {
+  background-color: #639845;
+  border-color: #639845;
+}
+
+.p-steps .p-steps-item.p-highlight .p-steps-number {
+  background-color: var(--siaj-blue) !important;
+  color: white !important;
+}
+.p-steps .p-steps-item.p-highlight .p-steps-title {
+  color: var(--siaj-blue) !important;
+  font-weight: 700;
+}
+
+.p-multiselect-chip .p-multiselect-token {
+  background-color: var(--siaj-blue);
+  color: white;
+}

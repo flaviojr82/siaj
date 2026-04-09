@@ -1,24 +1,17 @@
-import { Button } from 'primereact/button';
-import { Badge } from 'primereact/badge';
-import { Avatar } from 'primereact/avatar';
+import React from 'react';
+// Importamos o nosso novo componente de formulário
+import AuxiliarRegistrationForm from './components/AuxiliarRegistrationForm';
 
 function App() {
   return (
-    <div style={{ padding: '2rem', display: 'flex', gap: '2rem', alignItems: 'center' }}>
-      <h2>Testando PrimeReact</h2>
+    // Um contêiner limpo com um fundo cinza claro para destacar o cartão branco do formulário
+    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', padding: '2rem' }}>
       
-      {/* Botão com ícone */}
-      <Button label="Salvar" icon="pi pi-check" />
+      {/* Aqui fazemos a renderização central do formulário SIAJ */}
+      <AuxiliarRegistrationForm />
       
-      {/* Exemplo de Badge (Misc) */}
-      <i className="pi pi-bell p-overlay-badge" style={{ fontSize: '2rem' }}>
-        <Badge value="2" severity="danger"></Badge>
-      </i>
-
-      {/* Exemplo de Avatar (Misc) */}
-      <Avatar label="F" size="large" shape="circle" style={{ backgroundColor: '#2196F3', color: '#ffffff' }} />
     </div>
-  )
+  );
 }
 
 export default App;
