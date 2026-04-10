@@ -1,12 +1,67 @@
 import React, { useState } from 'react';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
+import { InputMask } from 'primereact/inputmask'; // Novo import para a máscara de telefone
 import { Dropdown } from 'primereact/dropdown';
 import { MultiSelect } from 'primereact/multiselect';
 import { Button } from 'primereact/button';
 import { Steps } from 'primereact/steps';
 import logoSiaj from '../assets/Logo_SIAJ_Sem_Fundo.png'; 
 import './SiajForm.css';
+
+// ============================================================================
+// FUNÇÕES DE VALIDAÇÃO DO SIAJ (Adicionadas para a RN001 e API)
+// ============================================================================
+
+// Função para validar o Dígito Verificador do CPF - Atende à RN001
+function validarEstruturaCPF(cpf) {
+    cpf = cpf.replace(/[^\d]+/g, '');
+    if (cpf === '' || cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+    let soma = 0;
+    let resto;
+
+    for (let i = 1; i <= 9; i++) {
+        soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    }
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+    soma = 0;
+    for (let i = 1; i <= 10; i++) {
+        soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    }
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+    return true;
+}
+
+// Função que simula a integração com a Receita Federal
+async function consultarSituacaoReceitaFederal(cpf) {
+    cpf = cpf.replace(/[^\d]+/g, '');
+    
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            // Mock: Considera CPFs que terminam em '0' como IRREGULARES
+            const situacao = cpf.endsWith('0') ? 'IRREGULAR' : 'REGULAR'; 
+            resolve({
+                status: 200,
+                dados: {
+                    cpf: cpf,
+                    nome: "NOME DO AUXILIAR DE TESTE",
+                    situacao_cadastral: situacao
+                }
+            });
+        }, 1500);
+    });
+}
+
+// ============================================================================
+// CÓDIGO EXISTENTE
+// ============================================================================
 
 const estadoInicial = {
   cpf: '', 
@@ -35,10 +90,36 @@ const StepRole = ({ data, updateData }) => {
   const [cpfInput, setCpfInput] = useState(data.cpf);
   const [cpfStatus, setCpfStatus] = useState(data.cpf ? 'valid' : 'idle');
 
-  const checkCpf = () => {
+  // Função checkCpf atualizada com as validações de estrutura e de API
+  const checkCpf = async () => {
     if (!cpfInput) return;
     
-    // MOCK DE DADOS PARA TESTE
+    // Passo 1: Validação Matemática (Dígito Verificador)
+    if (!validarEstruturaCPF(cpfInput)) {
+        setCpfStatus('invalid');
+        updateData({ cpf: '', atuacoes: [] });
+        return;
+    }
+
+    // Define o status de carregamento para a API simulada
+    setCpfStatus('loading');
+
+    // Passo 2: Consulta à Receita Federal (Mock)
+    try {
+        const respostaDaApi = await consultarSituacaoReceitaFederal(cpfInput);
+        
+        if (respostaDaApi.dados.situacao_cadastral !== 'REGULAR') {
+            setCpfStatus('irregular');
+            updateData({ cpf: '', atuacoes: [] });
+            return;
+        }
+    } catch (error) {
+        setCpfStatus('error_api');
+        updateData({ cpf: '', atuacoes: [] });
+        return;
+    }
+
+    // Passo 3: O seu mock original de CPFs já cadastrados no BD do SIAJ
     const CPFS_CADASTRADOS_MOCK = ['111.111.111-11', '11111111111', '123.456.789-00', '12345678900'];
     
     if (CPFS_CADASTRADOS_MOCK.includes(cpfInput)) {
@@ -66,11 +147,18 @@ const StepRole = ({ data, updateData }) => {
             value={cpfInput} 
             onChange={(e) => { setCpfInput(e.target.value); setCpfStatus('idle'); }} 
             placeholder="(ex: 123.456.789-00 ou 12345678900)" 
+            disabled={cpfStatus === 'loading'}
           />
-          <Button label="Validar" onClick={checkCpf} className="siaj-btn-primary" />
+          <Button label="Validar" onClick={checkCpf} className="siaj-btn-primary" loading={cpfStatus === 'loading'} />
         </div>
+        
+        {/* Mensagens de Feedback para o usuário baseadas no novo Status */}
+        {cpfStatus === 'invalid' && <small style={{ color: '#dc2626', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>CPF inválido. Verifique os números digitados.</small>}
+        {cpfStatus === 'loading' && <small style={{ color: '#0056b3', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>Consultando base de dados da Receita Federal...</small>}
+        {cpfStatus === 'irregular' && <small style={{ color: '#dc2626', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>Atenção: CPF com situação irregular na Receita Federal.</small>}
+        {cpfStatus === 'error_api' && <small style={{ color: '#dc2626', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>Erro de comunicação com o servidor de validação.</small>}
         {cpfStatus === 'duplicate' && <small style={{ color: '#dc2626', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>Este CPF já possui cadastro como Auxiliar da Justiça no sistema.</small>}
-        {cpfStatus === 'valid' && <small style={{ color: '#16a34a', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>CPF liberado. Prossiga com o cadastro.</small>}
+        {cpfStatus === 'valid' && <small style={{ color: '#16a34a', fontWeight: 'bold', display: 'block', marginTop: '0.5rem' }}>CPF validado e regular. Prossiga com o cadastro.</small>}
       </div>
 
       {cpfStatus === 'valid' && (
@@ -126,7 +214,18 @@ const StepPersonal = ({ data, updateData }) => {
       <h3 style={{ color: 'var(--siaj-blue)', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginTop: '2rem' }}>Contatos</h3>
       <div className="siaj-grid">
         <div className="siaj-col-6"><label className="siaj-field-label">E-mail Profissional *</label><InputText name="email" value={data.email} onChange={handleChange} /></div>
-        <div className="siaj-col-6"><label className="siaj-field-label">Telefone (Celular/WhatsApp) *</label><InputText name="telefone" value={data.telefone} onChange={handleChange} /></div>
+        <div className="siaj-col-6">
+          <label className="siaj-field-label">Telefone (Celular/WhatsApp) *</label>
+          {/* Adicionada máscara de telefone: (00) 00000-0000 */}
+          <InputMask 
+            name="telefone" 
+            value={data.telefone} 
+            onChange={handleChange} 
+            mask="(99) 99999-9999" 
+            placeholder="(00) 00000-0000"
+            unmask={true} // Salva no estado apenas os números
+          />
+        </div>
       </div>
     </div>
   );
@@ -169,7 +268,8 @@ const StepAddress = ({ data, updateData }) => {
         <div className="siaj-col-7"><label className="siaj-field-label">Logradouro *</label><InputText name="logradouro" value={data.logradouro} disabled /></div>
         <div className="siaj-col-2"><label className="siaj-field-label">Número *</label><InputText name="numero" value={data.numero} onChange={handleChange} /></div>
         
-        <div className="siaj-col-4"><label className="siaj-field-label">Complemento *</label><InputText name="complemento" value={data.complemento} onChange={handleChange} /></div>
+        {/* Campo Complemento agora não possui '*' visual */}
+        <div className="siaj-col-4"><label className="siaj-field-label">Complemento</label><InputText name="complemento" value={data.complemento} onChange={handleChange} /></div>
         <div className="siaj-col-4"><label className="siaj-field-label">Bairro *</label><InputText name="bairro" value={data.bairro} disabled /></div>
         <div className="siaj-col-3"><label className="siaj-field-label">Cidade *</label><InputText name="cidade" value={data.cidade} disabled /></div>
         <div className="siaj-col-1"><label className="siaj-field-label">UF *</label><InputText name="uf" value={data.uf} disabled /></div>
@@ -219,9 +319,12 @@ export const AuxiliarRegistrationForm = () => {
   // Validação estrita
   const isStepValid = (step) => {
     if (step === 0) return !!formData.cpf && formData.atuacoes.length > 0;
-    // Removido a obrigatoriedade de Nome Social e do CPF (que agora é validado no step 0)
+    
     if (step === 1) return !!(formData.nomeCivil && formData.dataNascimento && formData.sexo && formData.estadoCivil && formData.nacionalidade && formData.nomeMae && formData.profissao && formData.tipoDoc && formData.numeroDoc && formData.orgaoEmissor && formData.ufEmissor && formData.email && formData.telefone);
-    if (step === 2) return !!(formData.cep && formData.logradouro && formData.numero && formData.complemento && formData.bairro && formData.cidade && formData.uf);
+    
+    // Removido formData.complemento da validação obrigatória do Step 2
+    if (step === 2) return !!(formData.cep && formData.logradouro && formData.numero && formData.bairro && formData.cidade && formData.uf);
+    
     if (step === 3) {
       const required = Array.from(new Set(formData.atuacoes.flatMap(a => documentRequirements[a] || [])));
       return required.every(doc => formData.anexos[doc] !== null && formData.anexos[doc] !== undefined);
