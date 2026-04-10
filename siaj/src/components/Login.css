@@ -1,0 +1,80 @@
+/* Login.css - Estilos baseados no SSO Keycloak do TJPB */
+.keycloak-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  /* Fundo simulando o padrão escuro facetado do Keycloak */
+  background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+}
+
+.keycloak-header {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.keycloak-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  /* Borda azul característica do tema padrão do Keycloak */
+  border-top: 4px solid #0056b3; 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.keycloak-title {
+  color: #444444;
+  font-size: 1.5rem;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 0;
+}
+
+.keycloak-form .p-field {
+  margin-bottom: 1.5rem;
+}
+
+.keycloak-form label {
+  display: block;
+  color: #555555;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Sobrescrevendo o PrimeReact para ficar mais parecido com o HTML nativo do Keycloak */
+.keycloak-form .p-inputtext {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  font-size: 1rem;
+}
+
+.keycloak-form .p-inputtext:focus {
+  border-color: #0056b3;
+  box-shadow: none;
+}
+
+.keycloak-btn {
+  width: 100%;
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  padding: 0.75rem !important;
+  font-weight: 600;
+  border-radius: 2px !important;
+  margin-top: 1rem;
+}
+
+.keycloak-btn:hover {
+  background-color: #004494 !important;
+}
