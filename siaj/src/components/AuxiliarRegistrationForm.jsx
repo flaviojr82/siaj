@@ -39,7 +39,7 @@ const StepRole = ({ data, updateData }) => {
     if (!cpfInput) return;
     
     // MOCK DE DADOS PARA TESTE
-    const CPFS_CADASTRADOS_MOCK = ['111.111.111-11', '123.456.789-00'];
+    const CPFS_CADASTRADOS_MOCK = ['111.111.111-11', '11111111111', '123.456.789-00', '12345678900'];
     
     if (CPFS_CADASTRADOS_MOCK.includes(cpfInput)) {
       setCpfStatus('duplicate');
@@ -65,7 +65,7 @@ const StepRole = ({ data, updateData }) => {
           <InputText 
             value={cpfInput} 
             onChange={(e) => { setCpfInput(e.target.value); setCpfStatus('idle'); }} 
-            placeholder="Apenas números ou com pontuação" 
+            placeholder="(ex: 123.456.789-00 ou 12345678900)" 
           />
           <Button label="Validar" onClick={checkCpf} className="siaj-btn-primary" />
         </div>
