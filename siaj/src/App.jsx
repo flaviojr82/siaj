@@ -1,16 +1,22 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { Button } from 'primereact/button';
+
+// Importação dos seus componentes
 import AuxiliarRegistrationForm from './components/AuxiliarRegistrationForm';
 import Login from './components/Login';
+import Dashboard from './components/Dashboard';
 
-function App() {
+// Um pequeno componente para mostrar o cabeçalho apenas onde faz sentido
+const LayoutComCabecalho = ({ children }) => {
+  const location = useLocation();
+  // Oculta o botão de login se o usuário já estiver na tela de login ou no dashboard
+  const esconderBotaoLogin = location.pathname === '/login' || location.pathname === '/dashboard';
+
   return (
-    <BrowserRouter>
-      {/* Container principal com fundo cinza claro */}
-      <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh' }}>
-        
-        {/* Cabecalho Simples com Botão de Acesso */}
+    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh' }}>
+      
+      {!esconderBotaoLogin && (
         <header style={{
           backgroundColor: '#ffffff',
           padding: '1rem 2rem',
@@ -19,7 +25,6 @@ function App() {
           justifyContent: 'flex-end',
           alignItems: 'center'
         }}>
-          {/* O Link do react-router-dom permite navegar sem recarregar a página inteira */}
           <Link to="/login" style={{ textDecoration: 'none' }}>
             <Button 
               label="Acesso Restrito (Login)" 
@@ -30,22 +35,30 @@ function App() {
             />
           </Link>
         </header>
+      )}
 
-        {/* Área onde os componentes das rotas serão renderizados */}
-        <div style={{ padding: '2rem' }}>
-          <Routes>
-            {/* Rota padrão redireciona para o cadastro */}
-            <Route path="/" element={<Navigate to="/cadastro" />} />
-            
-            {/* Rota do Formulário de Cadastro */}
-            <Route path="/cadastro" element={<AuxiliarRegistrationForm />} />
-            
-            {/* Rota da Tela de Login (SSO Keycloak) */}
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </div>
-
+      {/* Área onde as páginas são carregadas */}
+      <div style={{ padding: '2rem' }}>
+        {children}
       </div>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <LayoutComCabecalho>
+        <Routes>
+          {/* Redirecionamento inicial */}
+          <Route path="/" element={<Navigate to="/cadastro" />} />
+          
+          {/* Telas do SIAJ */}
+          <Route path="/cadastro" element={<AuxiliarRegistrationForm />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </LayoutComCabecalho>
     </BrowserRouter>
   );
 }

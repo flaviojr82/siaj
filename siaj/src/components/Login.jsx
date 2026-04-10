@@ -1,23 +1,34 @@
 import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-// import { useNavigate } from 'react-router-dom'; // Descomente quando configurar o react-router-dom
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  // const navigate = useNavigate();
+  const [erroLogin, setErroLogin] = useState('');
+  
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
     
-    // No projeto final, aqui haverá uma chamada POST para a API do Keycloak ou do seu Back-end
-    console.log('Tentativa de login:', username);
-    
-    // Simulação do redirecionamento
-    alert('Simulação de login bem-sucedida! O sistema direcionaria você para o Dashboard do SIAJ.');
-    // navigate('/dashboard'); 
+    // Remove pontos e traços do que o usuário digitou
+    const cpfLimpo = username.replace(/[^\d]+/g, '');
+
+    // Verifica qual CPF foi digitado e direciona para o painel correto
+    if (cpfLimpo === '11111111111') {
+      localStorage.setItem('siaj_user_role', 'auxiliar');
+      navigate('/dashboard');
+    } 
+    else if (cpfLimpo === '99999999999') {
+      localStorage.setItem('siaj_user_role', 'servidor');
+      navigate('/dashboard');
+    } 
+    else {
+      setErroLogin('Credenciais inválidas. Verifique o CPF digitado.');
+    }
   };
 
   return (
@@ -29,12 +40,12 @@ export const Login = () => {
         
         <form onSubmit={handleLogin} className="keycloak-form">
           <div className="p-field">
-            <label htmlFor="username">Nome de usuário ou e-mail</label>
+            <label htmlFor="username">CPF</label>
             <InputText 
               id="username" 
               value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              autoComplete="username"
+              onChange={(e) => { setUsername(e.target.value); setErroLogin(''); }} 
+              placeholder="Digite apenas números"
               required
             />
           </div>
@@ -46,17 +57,26 @@ export const Login = () => {
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              autoComplete="current-password"
               required
             />
           </div>
+
+          {erroLogin && (
+            <div style={{ color: '#dc2626', marginBottom: '1rem', fontSize: '0.875rem', fontWeight: 'bold' }}>
+              {erroLogin}
+            </div>
+          )}
           
-          <Button 
-            type="submit" 
-            label="Entrar" 
-            className="keycloak-btn" 
-          />
+          <Button type="submit" label="Entrar" className="keycloak-btn" />
         </form>
+
+        {/* Dica para você (pode remover antes de apresentar se quiser) */}
+        <div style={{ marginTop: '2rem', fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center' }}>
+          <p><strong>Credenciais para teste:</strong></p>
+          <p>Auxiliar: 111.111.111-11</p>
+          <p>Servidor: 999.999.999-99</p>
+          <p>Senha: (qualquer uma)</p>
+        </div>
       </div>
     </div>
   );
