@@ -2,20 +2,18 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { Button } from 'primereact/button';
 
-// Importação dos seus componentes
 import AuxiliarRegistrationForm from './components/AuxiliarRegistrationForm';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
-// Um pequeno componente para mostrar o cabeçalho apenas onde faz sentido
 const LayoutComCabecalho = ({ children }) => {
   const location = useLocation();
-  // Oculta o botão de login se o usuário já estiver na tela de login ou no dashboard
   const esconderBotaoLogin = location.pathname === '/login' || location.pathname === '/dashboard';
+  // Retira o padding se estiver no Dashboard para a Sidebar encostar na borda
+  const isDashboard = location.pathname === '/dashboard';
 
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh' }}>
-      
       {!esconderBotaoLogin && (
         <header style={{
           backgroundColor: '#ffffff',
@@ -26,19 +24,13 @@ const LayoutComCabecalho = ({ children }) => {
           alignItems: 'center'
         }}>
           <Link to="/login" style={{ textDecoration: 'none' }}>
-            <Button 
-              label="Acesso Restrito (Login)" 
-              icon="pi pi-lock" 
-              severity="secondary" 
-              text 
-              style={{ fontWeight: 'bold' }}
-            />
+            <Button label="Acesso Restrito (Login)" icon="pi pi-lock" severity="secondary" text style={{ fontWeight: 'bold' }} />
           </Link>
         </header>
       )}
 
-      {/* Área onde as páginas são carregadas */}
-      <div style={{ padding: '2rem' }}>
+      {/* Se for o Dashboard, renderiza sem bordas (0 padding). Senão, usa 2rem */}
+      <div style={{ padding: isDashboard ? '0' : '2rem', height: isDashboard ? '100vh' : 'auto' }}>
         {children}
       </div>
     </div>
@@ -50,10 +42,7 @@ function App() {
     <BrowserRouter>
       <LayoutComCabecalho>
         <Routes>
-          {/* Redirecionamento inicial */}
           <Route path="/" element={<Navigate to="/cadastro" />} />
-          
-          {/* Telas do SIAJ */}
           <Route path="/cadastro" element={<AuxiliarRegistrationForm />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
