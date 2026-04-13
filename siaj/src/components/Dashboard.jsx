@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
@@ -6,12 +6,13 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { InputText } from 'primereact/inputtext';
-import { Sidebar } from 'primereact/sidebar';
+import { Menu } from 'primereact/menu';
+import { Divider } from 'primereact/divider';
 import logoSiaj from '../assets/Logo_SIAJ_Sem_Fundo.png';
 
 // --- Componente de Cartão de Estatística ---
 const StatCard = ({ title, value, icon, color, onClick }) => (
-  <div className="siaj-col-12 md:siaj-col-3" onClick={onClick} style={{ cursor: 'pointer', transition: 'transform 0.2s' }}>
+  <div onClick={onClick} style={{ cursor: 'pointer', transition: 'transform 0.2s', flex: '1 1 200px' }}>
     <Card style={{ borderLeft: `5px solid ${color}`, borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
@@ -26,13 +27,79 @@ const StatCard = ({ title, value, icon, color, onClick }) => (
   </div>
 );
 
-// --- LISTAGEM DE PROFISSIONAIS (Atualizada) ---
-const ProfissionaisList = ({ filter }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sidebarAcoesVisible, setSidebarAcoesVisible] = useState(false);
-  const [profissionalSelecionado, setProfissionalSelecionado] = useState(null);
+// --- TELA DE ANÁLISE DE CADASTRO (Nova Funcionalidade) ---
+const AnaliseCadastro = ({ profissional, onVoltar }) => {
+  const documentos = [
+    { id: 1, nome: 'RG_Frente.pdf', tipo: 'Identificação' },
+    { id: 2, nome: 'Diploma_Graduacao.pdf', tipo: 'Escolaridade' },
+    { id: 3, nome: 'Certidao_Negativa_Criminal.pdf', tipo: 'Certidão' }
+  ];
 
-  // Mock atualizado sem máscara, com novo status e novos registros para testar a paginação
+  return (
+    <Card title={`Analisar Cadastro: ${profissional.nome}`} subTitle={`Status Atual: ${profissional.status}`}>
+      <div className="grid">
+        <div className="col-12" style={{ marginBottom: '1.5rem' }}>
+           <h4 style={{ color: '#002b5c' }}><i className="pi pi-user mr-2"></i> Dados do Profissional</h4>
+           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+              <div><strong>Nome Completo:</strong><br/>{profissional.nome}</div>
+              <div><strong>CPF:</strong><br/>{profissional.cpf}</div>
+              <div><strong>Área de Atuação:</strong><br/>{profissional.atuacao}</div>
+           </div>
+        </div>
+
+        <Divider />
+
+        <div className="col-12" style={{ marginBottom: '1.5rem' }}>
+          <h4 style={{ color: '#002b5c' }}><i className="pi pi-file mr-2"></i> Documentação Anexada</h4>
+          <DataTable value={documentos} className="mt-3" size="small">
+            <Column field="tipo" header="Tipo de Documento" />
+            <Column field="nome" header="Arquivo" />
+            <Column header="Ações" body={() => (
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <Button icon="pi pi-eye" text tooltip="Visualizar" />
+                <Button icon="pi pi-download" text severity="secondary" tooltip="Baixar" />
+              </div>
+            )} />
+          </DataTable>
+        </div>
+
+        <Divider />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
+          <Button label="Voltar" icon="pi pi-arrow-left" text onClick={onVoltar} />
+          
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <Button 
+              label="Devolver para Correção" 
+              icon="pi pi-undo" 
+              severity="warning" 
+              onClick={() => { alert('O cadastro foi devolvido e o status será "Aguardando Correção".'); onVoltar(); }} 
+            />
+            <Button 
+              label="Reprovar Cadastro" 
+              icon="pi pi-times" 
+              severity="danger" 
+              onClick={() => { alert('O cadastro foi Reprovado definitivamente.'); onVoltar(); }} 
+            />
+            <Button 
+              label="Aprovar e Ativar" 
+              icon="pi pi-check" 
+              severity="success" 
+              onClick={() => { alert('O cadastro foi Aprovado e o status será "Ativo".'); onVoltar(); }} 
+            />
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+// --- LISTAGEM DE PROFISSIONAIS ---
+const ProfissionaisList = ({ filter, onAnalisar }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const menuRef = useRef(null);
+  const [selectedRow, setSelectedRow] = useState(null);
+
   const pendenciasMock = [
     { id: 1, nome: 'João da Silva', cpf: '111.111.111-11', atuacao: 'Perito', dataEnvio: '10/04/2026', status: 'Novo' },
     { id: 2, nome: 'Maria Oliveira', cpf: '222.222.222-22', atuacao: 'Leiloeiro', dataEnvio: '09/04/2026', status: 'Em Análise (TJPB)' },
@@ -43,10 +110,8 @@ const ProfissionaisList = ({ filter }) => {
     { id: 7, nome: 'Pedro Marques', cpf: '777.777.777-77', atuacao: 'Perito', dataEnvio: '14/04/2026', status: 'Ativo' },
   ];
 
-  // 1. Aplica o filtro do Card Superior (se houver)
   let dadosExibidos = filter ? pendenciasMock.filter(item => item.status === filter) : pendenciasMock;
 
-  // 2. Aplica a Busca Dinâmica e Unificada (Somente a partir de 3 caracteres)
   if (searchTerm.length >= 3) {
     const termo = searchTerm.toLowerCase();
     dadosExibidos = dadosExibidos.filter(item => 
@@ -56,7 +121,25 @@ const ProfissionaisList = ({ filter }) => {
     );
   }
 
-  // Template da Coluna de Ações (3 pontinhos)
+  const getMenuItems = () => {
+    if (!selectedRow) return [];
+    
+    const items = [];
+    
+    if (['Novo', 'Em Análise', 'Em Análise (TJPB)', 'Aguardando Reanálise'].includes(selectedRow.status)) {
+        items.push({ label: 'Analisar', icon: 'pi pi-search', command: () => onAnalisar(selectedRow) });
+    }
+    
+    items.push(
+        { label: 'Detalhar', icon: 'pi pi-id-card' },
+        { label: 'Editar', icon: 'pi pi-pencil' },
+        { label: 'Ativar/Inativar', icon: 'pi pi-power-off' },
+        { label: 'Excluir', icon: 'pi pi-trash', style: { color: 'var(--red-500)' } }
+    );
+    
+    return items;
+  };
+
   const acoesTemplate = (rowData) => (
     <Button 
       icon="pi pi-ellipsis-v" 
@@ -64,9 +147,9 @@ const ProfissionaisList = ({ filter }) => {
       rounded 
       severity="secondary" 
       aria-label="Ações" 
-      onClick={() => { 
-        setProfissionalSelecionado(rowData); 
-        setSidebarAcoesVisible(true); 
+      onClick={(e) => { 
+        setSelectedRow(rowData); 
+        menuRef.current.toggle(e); 
       }} 
     />
   );
@@ -77,7 +160,7 @@ const ProfissionaisList = ({ filter }) => {
       'Em Análise (TJPB)': 'warning', 
       'Ativo': 'success', 
       'Aguardando Correção (Auxiliar)': 'danger',
-      'Aguardando Reanálise': 'info'
+      'Aguardando Reanálise': 'help' 
     };
     return <Tag value={rowData.status} severity={severities[rowData.status] || 'info'} />;
   };
@@ -86,7 +169,6 @@ const ProfissionaisList = ({ filter }) => {
     <>
       <Card title={`Gestão de Profissionais ${filter ? `- Filtrando por: ${filter}` : '(Todos os Registros)'}`}>
         
-        {/* Campo de Filtro Unificado e Dinâmico */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
           <div style={{ position: 'relative', width: '100%', maxWidth: '350px' }}>
             <i className="pi pi-search" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
@@ -101,7 +183,6 @@ const ProfissionaisList = ({ filter }) => {
           </div>
         </div>
 
-        {/* Listagem com Paginador e Totalizador */}
         <DataTable 
           value={dadosExibidos} 
           responsiveLayout="scroll" 
@@ -120,47 +201,19 @@ const ProfissionaisList = ({ filter }) => {
           <Column header="Status" body={statusTemplate} />
           <Column header="Ações" body={acoesTemplate} align="center" style={{ width: '80px' }} />
         </DataTable>
+
+        <Menu model={getMenuItems()} popup ref={menuRef} id="popup_menu_acoes" />
       </Card>
-
-      {/* Sidebar de Ações Contextuais */}
-      <Sidebar 
-        visible={sidebarAcoesVisible} 
-        position="right" 
-        onHide={() => setSidebarAcoesVisible(false)} 
-        style={{ width: '320px' }}
-      >
-        {profissionalSelecionado && (
-          <div>
-            <h2 style={{ color: '#002b5c', margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>Ações</h2>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>
-              <strong>Profissional:</strong> {profissionalSelecionado.nome}<br/>
-              <strong>CPF:</strong> {profissionalSelecionado.cpf}
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {/* Analisar: Condicional para status específicos */}
-              {['Novo', 'Em Análise (TJPB)', 'Aguardando Reanálise'].includes(profissionalSelecionado.status) && (
-                <Button label="Analisar" icon="pi pi-search" style={{ backgroundColor: '#0056b3' }} onClick={() => setSidebarAcoesVisible(false)} />
-              )}
-              
-              {/* Demais ações permanentes */}
-              <Button label="Detalhar" icon="pi pi-id-card" severity="secondary" outlined onClick={() => setSidebarAcoesVisible(false)} />
-              <Button label="Editar" icon="pi pi-pencil" severity="secondary" outlined onClick={() => setSidebarAcoesVisible(false)} />
-              <Button label="Ativar/Inativar" icon="pi pi-power-off" severity="warning" outlined onClick={() => setSidebarAcoesVisible(false)} />
-              <Button label="Excluir" icon="pi pi-trash" severity="danger" outlined onClick={() => setSidebarAcoesVisible(false)} />
-            </div>
-          </div>
-        )}
-      </Sidebar>
     </>
   );
 };
 
 // --- Dashboard Principal do Servidor ---
 const ServidorHome = ({ onCardClick }) => (
-  <div className="siaj-grid">
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
     <StatCard title="Novos Cadastros" value="2" icon="pi pi-user-plus" color="#0056b3" onClick={() => onCardClick('Novo')} />
     <StatCard title="Em Análise (TJPB)" value="1" icon="pi pi-file-edit" color="#f59e0b" onClick={() => onCardClick('Em Análise (TJPB)')} />
+    <StatCard title="Aguardando Reanálise" value="1" icon="pi pi-sync" color="#8b5cf6" onClick={() => onCardClick('Aguardando Reanálise')} />
     <StatCard title="Auxiliares Ativos" value="2" icon="pi pi-check-circle" color="#16a34a" onClick={() => onCardClick('Ativo')} />
     <StatCard title="Aguardando Correção" value="1" icon="pi pi-exclamation-triangle" color="#ef4444" onClick={() => onCardClick('Aguardando Correção (Auxiliar)')} />
   </div>
@@ -184,6 +237,7 @@ export const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeView, setActiveView] = useState('inicio');
   const [listFilter, setListFilter] = useState(null); 
+  const [selectedProfessional, setSelectedProfessional] = useState(null);
 
   useEffect(() => {
     const loggedUser = localStorage.getItem('siaj_user_role');
@@ -204,6 +258,11 @@ export const Dashboard = () => {
   const handleCardClick = (filtro) => {
     setListFilter(filtro); 
     setActiveView('profissionais'); 
+  };
+
+  const handleAnalisar = (profissional) => {
+    setSelectedProfessional(profissional);
+    setActiveView('analisar_detalhe');
   };
 
   if (!userRole) return null;
@@ -288,7 +347,8 @@ export const Dashboard = () => {
         {/* Lógica de Troca de Telas */}
         {userRole === 'servidor' ? (
           activeView === 'inicio' ? <ServidorHome onCardClick={handleCardClick} /> : 
-          activeView === 'profissionais' ? <ProfissionaisList filter={listFilter} /> : 
+          activeView === 'profissionais' ? <ProfissionaisList filter={listFilter} onAnalisar={handleAnalisar} /> : 
+          activeView === 'analisar_detalhe' ? <AnaliseCadastro profissional={selectedProfessional} onVoltar={() => setActiveView('profissionais')} /> :
           <Card>Funcionalidade em desenvolvimento.</Card>
         ) : (
           activeView === 'inicio' ? <AuxiliarHome /> :
