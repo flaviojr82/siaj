@@ -67,33 +67,36 @@ const ServidorDashboard = ({ profissionais, onAction, changeTab }) => {
     );
   };
 
+  // Estilo base para os cartões clicáveis
+  const cardStyle = { flex: '1 1 18%', minWidth: '200px', cursor: 'pointer', borderLeft: '4px solid transparent' };
+
   return (
     <div className="animate__animated animate__fadeIn">
-      {/* Cards de Estatísticas com atalho para a listagem (cursor pointer) */}
-      <div className="siaj-grid" style={{ marginBottom: '2rem' }}>
-        <div className="siaj-col-12 md:siaj-col-2" onClick={() => changeTab('Profissionais')} style={{ cursor: 'pointer' }}>
-          <Card title="Novos" subTitle="Este mês" className="siaj-stat-card border-left-info">
-            <h2 style={{ color: '#3b82f6' }}>12</h2>
+      {/* Cards de Estatísticas Lado a Lado (Flexbox) */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ ...cardStyle, borderLeftColor: '#3b82f6' }} onClick={() => changeTab('Profissionais')}>
+          <Card title="Novos" subTitle="Este mês" className="shadow-2">
+            <h2 style={{ color: '#3b82f6', margin: 0, fontSize: '2rem' }}>12</h2>
           </Card>
         </div>
-        <div className="siaj-col-12 md:siaj-col-2" onClick={() => changeTab('Profissionais')} style={{ cursor: 'pointer' }}>
-          <Card title="Em Análise" subTitle="TJPB" className="siaj-stat-card border-left-warning">
-            <h2 style={{ color: '#f59e0b' }}>08</h2>
+        <div style={{ ...cardStyle, borderLeftColor: '#f59e0b' }} onClick={() => changeTab('Profissionais')}>
+          <Card title="Em Análise" subTitle="TJPB" className="shadow-2">
+            <h2 style={{ color: '#f59e0b', margin: 0, fontSize: '2rem' }}>08</h2>
           </Card>
         </div>
-        <div className="siaj-col-12 md:siaj-col-3" onClick={() => changeTab('Profissionais')} style={{ cursor: 'pointer' }}>
-          <Card title="Aguardando Reanálise" subTitle="Correções" className="siaj-stat-card border-left-help">
-            <h2 style={{ color: '#a855f7' }}>03</h2>
+        <div style={{ ...cardStyle, borderLeftColor: '#a855f7' }} onClick={() => changeTab('Profissionais')}>
+          <Card title="Reanálise" subTitle="Correções" className="shadow-2">
+            <h2 style={{ color: '#a855f7', margin: 0, fontSize: '2rem' }}>03</h2>
           </Card>
         </div>
-        <div className="siaj-col-12 md:siaj-col-2" onClick={() => changeTab('Profissionais')} style={{ cursor: 'pointer' }}>
-          <Card title="Pendentes" subTitle="Com Profissional" className="siaj-stat-card border-left-danger">
-            <h2 style={{ color: '#ef4444' }}>05</h2>
+        <div style={{ ...cardStyle, borderLeftColor: '#ef4444' }} onClick={() => changeTab('Profissionais')}>
+          <Card title="Pendentes" subTitle="Com Auxiliar" className="shadow-2">
+            <h2 style={{ color: '#ef4444', margin: 0, fontSize: '2rem' }}>05</h2>
           </Card>
         </div>
-        <div className="siaj-col-12 md:siaj-col-3" onClick={() => changeTab('Profissionais')} style={{ cursor: 'pointer' }}>
-          <Card title="Aprovados" subTitle="Total Ativos" className="siaj-stat-card border-left-success">
-            <h2 style={{ color: '#22c55e' }}>142</h2>
+        <div style={{ ...cardStyle, borderLeftColor: '#22c55e' }} onClick={() => changeTab('Profissionais')}>
+          <Card title="Aprovados" subTitle="Total Ativos" className="shadow-2">
+            <h2 style={{ color: '#22c55e', margin: 0, fontSize: '2rem' }}>142</h2>
           </Card>
         </div>
       </div>
@@ -116,22 +119,21 @@ const AuxiliarHome = () => {
   const navigate = useNavigate();
   return (
     <div className="animate__animated animate__fadeIn">
-      <div className="siaj-grid">
-        <div className="siaj-col-12 md:siaj-col-6">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
+        <div style={{ flex: '1 1 60%' }}>
           <Card title="Bem-vindo(a) ao SIAJ">
-            <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
+            <p style={{ color: '#64748b', marginBottom: '1.5rem', lineHeight: '1.5' }}>
               Detectamos que o seu cadastro de Auxiliar da Justiça ainda precisa ser complementado para análise.
             </p>
             <Button 
-              label="Auxiliar da Justiça (Completar Cadastro)" 
+              label="Completar Cadastro" 
               icon="pi pi-file-edit" 
-              className="siaj-btn-primary" 
-              style={{ fontWeight: 'bold' }}
+              style={{ backgroundColor: '#002b5c', borderColor: '#002b5c', fontWeight: 'bold' }}
               onClick={() => navigate('/completar-cadastro')} 
             />
           </Card>
         </div>
-        <div className="siaj-col-12 md:siaj-col-4">
+        <div style={{ flex: '1 1 35%' }}>
           <Card title="Meu Status Atual">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
               <Tag value="CADASTRO INCOMPLETO" severity="danger" style={{ fontSize: '1rem', padding: '0.6rem 1rem' }} />
@@ -149,39 +151,53 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Resgata a permissão informada no login (auxiliar ou servidor). Padrão para evitar quebra de rota direta.
   const [userRole, setUserRole] = useState(location.state?.role || 'servidor'); 
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [activeTab, setActiveTab] = useState('Home');
 
   const handleLogout = () => navigate('/welcome');
 
+  // Estilos padronizados dos botões do menu para estado aberto/fechado
+  const getMenuBtnStyle = (tabName) => ({
+    width: '100%', 
+    color: activeTab === tabName ? '#f59e0b' : '#ffffff', 
+    justifyContent: sidebarVisible ? 'flex-start' : 'center', 
+    padding: '1rem',
+    borderRadius: '8px',
+    marginBottom: '0.5rem',
+    transition: 'background-color 0.2s'
+  });
+
   return (
-    <div className="siaj-layout-wrapper" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
       
       {/* Sidebar Retrátil */}
-      <div className="siaj-sidebar" style={{ 
+      <div style={{ 
         width: sidebarVisible ? '260px' : '80px', 
         backgroundColor: '#002b5c', 
         color: '#fff', 
         transition: 'width 0.3s ease',
         display: 'flex', 
-        flexDirection: 'column'
+        flexDirection: 'column',
+        boxShadow: '4px 0 10px rgba(0,0,0,0.1)',
+        zIndex: 10
       }}>
-        <div style={{ padding: '1.5rem', textAlign: 'center', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Logo container */}
+        <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           {sidebarVisible ? (
              <img src={logoSiaj} alt="SIAJ" style={{ width: '140px' }} />
           ) : (
-             <h2 style={{ margin: 0, fontSize: '1.5rem' }}>SJ</h2>
+             <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#f59e0b' }}>SJ</h2>
           )}
         </div>
 
-        <div style={{ flex: 1, padding: '1rem 0' }}>
+        {/* Menu Items */}
+        <div style={{ flex: 1, padding: '1.5rem 1rem', display: 'flex', flexDirection: 'column' }}>
           <Button 
             icon="pi pi-home" 
             label={sidebarVisible ? "Início" : ""} 
             text 
-            style={{ width: '100%', color: activeTab === 'Home' ? '#f59e0b' : '#fff', justifyContent: sidebarVisible ? 'flex-start' : 'center', padding: '1rem' }}
+            style={getMenuBtnStyle('Home')}
             onClick={() => setActiveTab('Home')}
           />
           
@@ -190,7 +206,7 @@ const Dashboard = () => {
               icon="pi pi-users" 
               label={sidebarVisible ? "Profissionais" : ""} 
               text 
-              style={{ width: '100%', color: activeTab === 'Profissionais' ? '#f59e0b' : '#fff', justifyContent: sidebarVisible ? 'flex-start' : 'center', padding: '1rem' }}
+              style={getMenuBtnStyle('Profissionais')}
               onClick={() => setActiveTab('Profissionais')}
             />
           )}
@@ -199,44 +215,58 @@ const Dashboard = () => {
             icon="pi pi-cog" 
             label={sidebarVisible ? "Configurações" : ""} 
             text 
-            style={{ width: '100%', color: '#fff', justifyContent: sidebarVisible ? 'flex-start' : 'center', padding: '1rem' }}
+            style={getMenuBtnStyle('Config')}
           />
         </div>
 
-        <div style={{ padding: '1rem' }}>
+        {/* Footer Sidebar */}
+        <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <Button 
             icon="pi pi-sign-out" 
             label={sidebarVisible ? "Sair" : ""} 
             severity="danger" 
             text 
-            style={{ width: '100%', justifyContent: sidebarVisible ? 'flex-start' : 'center' }}
+            style={{ width: '100%', justifyContent: sidebarVisible ? 'flex-start' : 'center', padding: '1rem' }}
             onClick={handleLogout}
           />
         </div>
       </div>
 
       {/* Área de Conteúdo Principal */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#f1f5f9', overflowY: 'auto' }}>
-        <header style={{ backgroundColor: '#fff', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-          {/* Botão de Retrair/Expandir a Sidebar */}
-          <Button icon="pi pi-bars" text severity="secondary" onClick={() => setSidebarVisible(!sidebarVisible)} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+        
+        {/* Cabeçalho */}
+        <header style={{ 
+          backgroundColor: '#ffffff', 
+          minHeight: '80px',
+          padding: '0 2rem', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+          zIndex: 5
+        }}>
+          <Button icon="pi pi-bars" text severity="secondary" size="large" onClick={() => setSidebarVisible(!sidebarVisible)} />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 'bold', color: '#002b5c' }}>
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontWeight: 'bold', color: '#002b5c', fontSize: '1rem' }}>
                 {userRole === 'servidor' ? 'Carlos Validador' : 'João Profissional'}
-              </div>
-              <small style={{ color: '#64748b' }}>{userRole === 'servidor' ? 'Servidor TJPB' : 'Profissional Liberal'}</small>
+              </span>
+              <span style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                {userRole === 'servidor' ? 'Servidor TJPB' : 'Profissional Liberal'}
+              </span>
             </div>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#002b5c', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+            <div style={{ width: '45px', height: '45px', borderRadius: '50%', backgroundColor: '#002b5c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>
               {userRole === 'servidor' ? 'CV' : 'JP'}
             </div>
           </div>
         </header>
 
-        <div style={{ padding: '2rem' }}>
-          <div style={{ marginBottom: '1.5rem' }}>
-             <h1 style={{ color: '#002b5c', margin: 0 }}>{activeTab}</h1>
+        {/* Corpo da Página */}
+        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+          <div style={{ marginBottom: '2rem' }}>
+             <h1 style={{ color: '#002b5c', margin: 0, fontSize: '1.8rem' }}>{activeTab}</h1>
           </div>
 
           {userRole === 'servidor' ? (
