@@ -10,7 +10,7 @@ const Welcome = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
       <Card style={{ width: '100%', maxWidth: '500px', textAlign: 'center', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
-        <img src={logoSiaj} alt="Logo SIAJ" style={{ width: '200px', marginBottom: '1.5rem' }} />
+        <img src={logoSiaj} alt="Logo SIAJ" style={{ width: '400px', marginBottom: '1.5rem' }} />
         <h2 style={{ color: '#002b5c', marginBottom: '0.5rem' }}>Bem-vindo ao SIAJ</h2>
         <p style={{ color: '#64748b', marginBottom: '2.5rem' }}>Sistema de Auxiliares da Justiça do TJPB</p>
         

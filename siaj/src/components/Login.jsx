@@ -32,7 +32,7 @@ const Login = () => {
   return (
     <div className="login-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
       <Card className="login-card" style={{ width: '100%', maxWidth: '400px', padding: '2rem', textAlign: 'center', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
-        <img src={logoSiaj} alt="Logo SIAJ" style={{ width: '180px', marginBottom: '2rem' }} />
+        <img src={logoSiaj} alt="Logo SIAJ" style={{ width: '300px', marginBottom: '2rem' }} />
         
         <form onSubmit={handleLogin} className="p-fluid">
           <div style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
