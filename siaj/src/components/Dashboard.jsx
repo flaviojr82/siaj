@@ -6,6 +6,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Menu } from 'primereact/menu';
+import { InputText } from 'primereact/inputtext';
 import logoSiaj from '../assets/Logo_SIAJ_Sem_Fundo.png';
 
 // --- DADOS MOCK (SIMULADOS) ---
@@ -67,12 +68,10 @@ const ServidorDashboard = ({ profissionais, onAction, changeTab }) => {
     );
   };
 
-  // Estilo base para os cartões clicáveis
   const cardStyle = { flex: '1 1 18%', minWidth: '200px', cursor: 'pointer', borderLeft: '4px solid transparent' };
 
   return (
     <div className="animate__animated animate__fadeIn">
-      {/* Cards de Estatísticas Lado a Lado (Flexbox) */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div style={{ ...cardStyle, borderLeftColor: '#3b82f6' }} onClick={() => changeTab('Profissionais')}>
           <Card title="Novos" subTitle="Este mês" className="shadow-2">
@@ -117,31 +116,86 @@ const ServidorDashboard = ({ profissionais, onAction, changeTab }) => {
 // --- COMPONENTE: HOME DO AUXILIAR ---
 const AuxiliarHome = () => {
   const navigate = useNavigate();
+
+  // Dados pré-preenchidos vindos do cadastro básico
+  const dadosCadastrais = {
+    nomeCivil: 'João da Silva',
+    email: 'joao.silva@email.com',
+    cpf: '111.111.111-11',
+    dataNascimento: '15/05/1980',
+    nomeMae: 'Maria da Silva',
+    statusAtual: 'Cadastro Incompleto' // Opções: "Cadastro Incompleto", "Cadastro em Análise", "Cadastro Ativo", "Cadastro Reprovado", "Cadastro Inativo"
+  };
+
+  const getStatusSeverity = (status) => {
+    switch (status) {
+      case 'Cadastro Ativo': return 'success';
+      case 'Cadastro em Análise': return 'warning';
+      case 'Cadastro Reprovado': 
+      case 'Cadastro Inativo': return 'danger';
+      default: return 'info';
+    }
+  };
+
   return (
     <div className="animate__animated animate__fadeIn">
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-        <div style={{ flex: '1 1 60%' }}>
-          <Card title="Bem-vindo(a) ao SIAJ">
-            <p style={{ color: '#64748b', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              Detectamos que o seu cadastro de Auxiliar da Justiça ainda precisa ser complementado para análise.
-            </p>
-            <Button 
-              label="Completar Cadastro" 
-              icon="pi pi-file-edit" 
-              style={{ backgroundColor: '#002b5c', borderColor: '#002b5c', fontWeight: 'bold' }}
-              onClick={() => navigate('/completar-cadastro')} 
-            />
-          </Card>
-        </div>
-        <div style={{ flex: '1 1 35%' }}>
-          <Card title="Meu Status Atual">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
-              <Tag value="CADASTRO INCOMPLETO" severity="danger" style={{ fontSize: '1rem', padding: '0.6rem 1rem' }} />
-              <small style={{ color: '#94a3b8' }}>Última atualização: Hoje</small>
-            </div>
-          </Card>
-        </div>
+      <div style={{ marginBottom: '1rem' }}>
+        <Tag 
+          value={dadosCadastrais.statusAtual} 
+          severity={getStatusSeverity(dadosCadastrais.statusAtual)} 
+          style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+        />
       </div>
+
+      <Card title="Meus Dados Cadastrais">
+        <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
+          Abaixo estão os dados preenchidos em seu cadastro básico. Revise-os antes de submeter.
+        </p>
+        
+        <div className="p-fluid" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 45%' }}>
+              <label style={{ display: 'block', color: '#002b5c', fontWeight: 'bold', marginBottom: '0.5rem' }}>Nome Completo</label>
+              <InputText value={dadosCadastrais.nomeCivil} disabled />
+            </div>
+            <div style={{ flex: '1 1 45%' }}>
+              <label style={{ display: 'block', color: '#002b5c', fontWeight: 'bold', marginBottom: '0.5rem' }}>E-mail</label>
+              <InputText value={dadosCadastrais.email} disabled />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 30%' }}>
+              <label style={{ display: 'block', color: '#002b5c', fontWeight: 'bold', marginBottom: '0.5rem' }}>CPF</label>
+              <InputText value={dadosCadastrais.cpf} disabled />
+            </div>
+            <div style={{ flex: '1 1 30%' }}>
+              <label style={{ display: 'block', color: '#002b5c', fontWeight: 'bold', marginBottom: '0.5rem' }}>Data de Nascimento</label>
+              <InputText value={dadosCadastrais.dataNascimento} disabled />
+            </div>
+            <div style={{ flex: '1 1 30%' }}>
+              <label style={{ display: 'block', color: '#002b5c', fontWeight: 'bold', marginBottom: '0.5rem' }}>Nome da Mãe</label>
+              <InputText value={dadosCadastrais.nomeMae} disabled />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem' }}>
+          <Button 
+            label="Editar Cadastro" 
+            icon="pi pi-user-edit" 
+            severity="secondary" 
+            outlined
+            onClick={() => navigate('/completar-cadastro')} 
+          />
+          <Button 
+            label="Submeter Cadastro" 
+            icon="pi pi-send" 
+            style={{ backgroundColor: '#002b5c', borderColor: '#002b5c', fontWeight: 'bold' }}
+            onClick={() => alert('Cadastro submetido com sucesso para análise do TJPB!')} 
+          />
+        </div>
+      </Card>
     </div>
   );
 };
@@ -157,7 +211,6 @@ const Dashboard = () => {
 
   const handleLogout = () => navigate('/welcome');
 
-  // Estilos padronizados dos botões do menu para estado aberto/fechado
   const getMenuBtnStyle = (tabName) => ({
     width: '100%', 
     color: activeTab === tabName ? '#f59e0b' : '#ffffff', 
@@ -182,12 +235,20 @@ const Dashboard = () => {
         boxShadow: '4px 0 10px rgba(0,0,0,0.1)',
         zIndex: 10
       }}>
-        {/* Logo container */}
-        <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        {/* Logo Container com Fundo Branco (Aumentado conforme pedido) */}
+        <div style={{ 
+          backgroundColor: '#ffffff', 
+          height: '200px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '1rem', 
+          borderBottom: '1px solid rgba(255,255,255,0.1)' 
+        }}>
           {sidebarVisible ? (
-             <img src={logoSiaj} alt="SIAJ" style={{ width: '140px' }} />
+             <img src={logoSiaj} alt="SIAJ" style={{ width: '400px' }} />
           ) : (
-             <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#f59e0b' }}>SJ</h2>
+             <img src={logoSiaj} alt="SIAJ" style={{ width: '150px' }} />
           )}
         </div>
 
@@ -211,12 +272,7 @@ const Dashboard = () => {
             />
           )}
 
-          <Button 
-            icon="pi pi-cog" 
-            label={sidebarVisible ? "Configurações" : ""} 
-            text 
-            style={getMenuBtnStyle('Config')}
-          />
+          {/* Opção Configurações removida conforme solicitado */}
         </div>
 
         {/* Footer Sidebar */}
