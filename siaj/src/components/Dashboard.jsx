@@ -117,14 +117,13 @@ const ServidorDashboard = ({ profissionais, onAction, changeTab }) => {
 const AuxiliarHome = () => {
   const navigate = useNavigate();
 
-  // Dados pré-preenchidos vindos do cadastro básico
   const dadosCadastrais = {
-    nomeCivil: 'João da Silva',
+    nomeCivil: 'João da Silva (Dados do Pré-Cadastro)',
     email: 'joao.silva@email.com',
     cpf: '111.111.111-11',
     dataNascimento: '15/05/1980',
     nomeMae: 'Maria da Silva',
-    statusAtual: 'Cadastro Incompleto' // Opções: "Cadastro Incompleto", "Cadastro em Análise", "Cadastro Ativo", "Cadastro Reprovado", "Cadastro Inativo"
+    statusAtual: 'Cadastro Incompleto'
   };
 
   const getStatusSeverity = (status) => {
@@ -218,7 +217,9 @@ const Dashboard = () => {
     padding: '1rem',
     borderRadius: '8px',
     marginBottom: '0.5rem',
-    transition: 'background-color 0.2s'
+    transition: 'background-color 0.2s',
+    display: 'flex',
+    alignItems: 'center'
   });
 
   return (
@@ -235,56 +236,63 @@ const Dashboard = () => {
         boxShadow: '4px 0 10px rgba(0,0,0,0.1)',
         zIndex: 10
       }}>
-        {/* Logo Container com Fundo Branco (Aumentado conforme pedido) */}
+        {/* Logo Container com Fundo Branco */}
         <div style={{ 
           backgroundColor: '#ffffff', 
-          height: '200px', 
+          height: '250px', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center', 
-          padding: '1rem', 
+          padding: '1.5rem', 
           borderBottom: '1px solid rgba(255,255,255,0.1)' 
         }}>
           {sidebarVisible ? (
-             <img src={logoSiaj} alt="SIAJ" style={{ width: '400px' }} />
+             <img src={logoSiaj} alt="SIAJ" style={{ width: '400px' }} /> 
           ) : (
              <img src={logoSiaj} alt="SIAJ" style={{ width: '150px' }} />
           )}
         </div>
 
-        {/* Menu Items */}
+        {/* Menu Items com estrutura personalizada para colar o texto ao ícone */}
         <div style={{ flex: 1, padding: '1.5rem 1rem', display: 'flex', flexDirection: 'column' }}>
           <Button 
-            icon="pi pi-home" 
-            label={sidebarVisible ? "Início" : ""} 
             text 
             style={getMenuBtnStyle('Home')}
             onClick={() => setActiveTab('Home')}
-          />
+          >
+            <i className="pi pi-home" style={{ fontSize: '1.1rem' }}></i>
+            {sidebarVisible && <span style={{ marginLeft: '0.75rem' }}>Início</span>}
+          </Button>
           
           {userRole === 'servidor' && (
             <Button 
-              icon="pi pi-users" 
-              label={sidebarVisible ? "Profissionais" : ""} 
               text 
               style={getMenuBtnStyle('Profissionais')}
               onClick={() => setActiveTab('Profissionais')}
-            />
+            >
+              <i className="pi pi-users" style={{ fontSize: '1.1rem' }}></i>
+              {sidebarVisible && <span style={{ marginLeft: '0.75rem' }}>Profissionais</span>}
+            </Button>
           )}
-
-          {/* Opção Configurações removida conforme solicitado */}
         </div>
 
         {/* Footer Sidebar */}
         <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <Button 
-            icon="pi pi-sign-out" 
-            label={sidebarVisible ? "Sair" : ""} 
             severity="danger" 
             text 
-            style={{ width: '100%', justifyContent: sidebarVisible ? 'flex-start' : 'center', padding: '1rem' }}
+            style={{ 
+              width: '100%', 
+              justifyContent: sidebarVisible ? 'flex-start' : 'center', 
+              padding: '1rem',
+              display: 'flex',
+              alignItems: 'center'
+            }}
             onClick={handleLogout}
-          />
+          >
+            <i className="pi pi-sign-out" style={{ fontSize: '1.1rem' }}></i>
+            {sidebarVisible && <span style={{ marginLeft: '0.75rem' }}>Sair</span>}
+          </Button>
         </div>
       </div>
 
