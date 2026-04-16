@@ -15,6 +15,16 @@ const Welcome = () => {
         <p style={{ color: '#64748b', marginBottom: '2.5rem' }}>Sistema de Auxiliares da Justiça do TJPB</p>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Botão Sou Servidor: Ajustado para ser branco com borda e texto em azul */}
+          <Button 
+            label="Sou Servidor" 
+            icon="pi pi-desktop" 
+            size="large" 
+            outlined
+            style={{ color: '#1a4480', borderColor: '#1a4480' }}
+            onClick={() => navigate('/login')} 
+          />
+          
           <Button 
             label="Já sou Profissional" 
             icon="pi pi-sign-in" 
@@ -22,6 +32,7 @@ const Welcome = () => {
             className="siaj-btn-primary" 
             onClick={() => navigate('/login')} 
           />
+          
           <Button 
             label="Quero me Cadastrar" 
             icon="pi pi-user-plus" 

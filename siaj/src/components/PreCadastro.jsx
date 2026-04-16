@@ -191,10 +191,6 @@ const PreCadastro = () => {
                     <InputText name="nome" value={data.nome} onChange={handleChange} />
                   </div>
                   <div>
-                    <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>E-mail *</label>
-                    <InputText name="email" value={data.email} onChange={handleChange} />
-                  </div>
-                  <div>
                     <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>CPF</label>
                     <InputMask value={data.cpf} disabled mask="999.999.999-99" />
                   </div>
@@ -205,14 +201,6 @@ const PreCadastro = () => {
                   <div>
                     <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Nome da Mãe *</label>
                     <InputText name="nomeMae" value={data.nomeMae} onChange={handleChange} />
-                  </div>
-                  <div>
-                    <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Senha *</label>
-                    <Password name="senha" value={data.senha} onChange={handleChange} toggleMask feedback={false} />
-                  </div>
-                  <div>
-                    <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Confirmar Senha *</label>
-                    <Password name="confSenha" value={data.confSenha} onChange={handleChange} toggleMask feedback={false} />
                   </div>
 
                   <div className="col-12" style={{ gridColumn: 'span 2', marginTop: '1.5rem' }}>
@@ -309,19 +297,37 @@ const PreCadastro = () => {
 
                 </div>
               </TabPanel>
+
+              {/* NOVA ABA: CREDENCIAIS */}
+              <TabPanel headerTemplate={(options) => tabHeaderTemplate(options, "3", "Credenciais")}>
+                <div className="grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginTop: '1rem' }}>
+                  <div>
+                    <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>E-mail *</label>
+                    <InputText name="email" value={data.email} onChange={handleChange} />
+                  </div>
+                  <div>
+                    <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Senha *</label>
+                    <Password name="senha" value={data.senha} onChange={handleChange} toggleMask feedback={false} />
+                  </div>
+                  <div>
+                    <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Confirmar Senha *</label>
+                    <Password name="confSenha" value={data.confSenha} onChange={handleChange} toggleMask feedback={false} />
+                  </div>
+                </div>
+              </TabPanel>
             </TabView>
 
             <div style={{ marginTop: '2rem', borderTop: '1px solid #dee2e6', paddingTop: '1.5rem' }}>
-              {activeIndex === 1 && (
+              {activeIndex === 2 && (
                 <div className="flex align-items-center mb-4">
                   <Checkbox inputId="termos" checked={data.termos} onChange={(e) => setData({...data, termos: e.checked})} />
                   <label htmlFor="termos" className="ml-2" style={{ fontSize: '0.875rem' }}>Eu concordo com os termos e condições</label>
                 </div>
               )}
               <div className="flex justify-content-end gap-2">
-                <Button label="Voltar" severity="secondary" text onClick={() => activeIndex === 0 ? setStep(1) : setActiveIndex(0)} />
-                {activeIndex === 0 ? (
-                  <Button label="Avançar" icon="pi pi-arrow-right" iconPos="right" className="siaj-btn-primary" onClick={() => setActiveIndex(1)} />
+                <Button label="Voltar" severity="secondary" text onClick={() => activeIndex === 0 ? setStep(1) : setActiveIndex(activeIndex - 1)} />
+                {activeIndex < 2 ? (
+                  <Button label="Avançar" icon="pi pi-arrow-right" iconPos="right" className="siaj-btn-primary" onClick={() => setActiveIndex(activeIndex + 1)} />
                 ) : (
                   <Button 
                     label="Concluir Registro" 
