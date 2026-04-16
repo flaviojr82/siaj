@@ -138,18 +138,44 @@ const PreCadastro = () => {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <img src={logoSiaj} alt="Logo SIAJ" style={{ width: step === 2 ? '200px' : '300px', marginBottom: '1rem' }} />
-          {/* Título "Registrar-se" oculto na etapa de sucesso (step 3) */}
-          {step !== 3 && <h2 style={{ color: '#f59e0b', margin: 0 }}>Registrar-se</h2>}
+          
+          {/* Títulos dinâmicos com base na Etapa */}
+          {step === 1 && (
+            <>
+              <h2 style={{ color: '#f59e0b', margin: 0 }}>Verificação de CPF</h2>
+              <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem', marginBottom: 0 }}>
+                Informe seu CPF para verificarmos seu cadastro
+              </p>
+            </>
+          )}
+          {step === 2 && <h2 style={{ color: '#f59e0b', margin: 0 }}>Registrar-se</h2>}
         </div>
 
+        {/* PASSO 1: Verificação de CPF */}
         {step === 1 && (
           <div className="p-fluid">
             <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>CPF</label>
             <InputMask name="cpf" value={data.cpf} onChange={handleChange} mask="999.999.999-99" placeholder="000.000.000-00" />
-            <Button label="Verificar CPF" icon="pi pi-check" className="siaj-btn-primary mt-4" onClick={handleVerificarCpf} />
+            
+            <Button label="Continuar" className="siaj-btn-primary mt-4" onClick={handleVerificarCpf} />
+            
+            {/* Opção para redirecionar ao Login */}
+            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+              <a 
+                href="#/login" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/login');
+                }} 
+                style={{ color: '#1a4480', fontWeight: 'bold', textDecoration: 'none', cursor: 'pointer' }}
+              >
+                Já sou profissional
+              </a>
+            </div>
           </div>
         )}
 
+        {/* PASSO 2: Formulário Completo */}
         {step === 2 && (
           <div className="p-fluid">
             <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
