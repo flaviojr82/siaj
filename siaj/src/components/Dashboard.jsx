@@ -7,6 +7,7 @@ import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Menu } from 'primereact/menu';
 import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
 import logoSiaj from '../assets/Logo_SIAJ_Sem_Fundo.png';
 
 // --- DADOS MOCK (SIMULADOS) ---
@@ -116,6 +117,7 @@ const ServidorDashboard = ({ profissionais, onAction, changeTab }) => {
 // --- COMPONENTE: HOME DO AUXILIAR ---
 const AuxiliarHome = () => {
   const navigate = useNavigate();
+  const toast = useRef(null);
 
   const dadosCadastrais = {
     nomeCivil: 'João da Silva (Dados do Pré-Cadastro)',
@@ -136,8 +138,28 @@ const AuxiliarHome = () => {
     }
   };
 
+  const handleSubmeterAnalise = () => {
+    if (dadosCadastrais.statusAtual === 'Cadastro Incompleto') {
+      toast.current.show({ 
+        severity: 'warn', 
+        summary: 'Atenção', 
+        detail: 'Não é possível enviar para análise. Faltam dados obrigatórios em seu cadastro. Por favor, clique em "Editar Cadastro" para preencher todas as informações necessárias.', 
+        life: 6000 
+      });
+    } else {
+      toast.current.show({ 
+        severity: 'success', 
+        summary: 'Sucesso', 
+        detail: 'Cadastro submetido com sucesso para análise do TJPB!', 
+        life: 3000 
+      });
+    }
+  };
+
   return (
     <div className="animate__animated animate__fadeIn">
+      <Toast ref={toast} position="top-right" />
+      
       <div style={{ marginBottom: '1rem' }}>
         <Tag 
           value={dadosCadastrais.statusAtual} 
@@ -188,10 +210,10 @@ const AuxiliarHome = () => {
             onClick={() => navigate('/completar-cadastro')} 
           />
           <Button 
-            label="Submeter Cadastro" 
+            label="Submeter para Análise" 
             icon="pi pi-send" 
             style={{ backgroundColor: '#002b5c', borderColor: '#002b5c', fontWeight: 'bold' }}
-            onClick={() => alert('Cadastro submetido com sucesso para análise do TJPB!')} 
+            onClick={handleSubmeterAnalise} 
           />
         </div>
       </Card>
