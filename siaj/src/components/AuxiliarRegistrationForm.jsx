@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
-import { Password } from 'primereact/password';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { InputMask } from 'primereact/inputmask';
@@ -19,16 +18,15 @@ export default function AuxiliarRegistrationForm() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [naoSeiCep, setNaoSeiCep] = useState(false);
 
-  // Dados pré-preenchidos (Adicionado array vazio para areasAtuacao)
+  // Dados pré-preenchidos
   const [data, setData] = useState({
     nome: 'Aparecido Filho', 
-    email: 'teste@e-mail.com', 
+    email: 'teste@e-mail.com', // Informação simulada de e-mail
     senha: 'senha-simulada', 
     confSenha: 'senha-simulada',
     cpf: '111.111.111-11', 
     dataNasc: '15/05/1980', 
     nomeMae: 'Maria da Silva', 
-    termos: true,
     nomeSocial: '', 
     sexo: 'M', 
     estadoCivil: 'C', 
@@ -46,7 +44,7 @@ export default function AuxiliarRegistrationForm() {
     bairro: 'Centro', 
     cidade: 'João Pessoa', 
     uf: 'PB',
-    areasAtuacao: [] // Novo campo para Aba 3
+    areasAtuacao: [] 
   });
 
   const ufs = [
@@ -76,7 +74,6 @@ export default function AuxiliarRegistrationForm() {
     { label: 'Carteira Funcional', value: 'FUNC' }, { label: 'Identidade Militar', value: 'MIL' }
   ];
 
-  // Matriz de Documentos por Área
   const areasOptions = [
     { label: 'Perito', value: 'Perito' },
     { label: 'Leiloeiro', value: 'Leiloeiro' },
@@ -120,10 +117,10 @@ export default function AuxiliarRegistrationForm() {
     return cepValido && data.logradouro && data.numero && data.bairro && data.cidade && data.uf;
   };
 
-  // Função genérica de salvamento para os dois botões finais
   const handleSave = (mensagem) => {
     toast.current.show({ severity: 'success', summary: 'Sucesso', detail: mensagem, life: 3000 });
-    setTimeout(() => navigate('/'), 2000);
+    // CORREÇÃO AQUI: Retornar para o painel com o perfil correto de 'auxiliar'
+    setTimeout(() => navigate('/', { state: { role: 'auxiliar' } }), 2000);
   };
 
   const tabHeaderTemplate = (options, num, title) => {
@@ -164,10 +161,9 @@ export default function AuxiliarRegistrationForm() {
         <div className="p-fluid">
           <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
             
-            {/* ABA 1 - DADOS PESSOAIS (Inalterada) */}
+            {/* ABA 1 - DADOS PESSOAIS */}
             <TabPanel headerTemplate={(options) => tabHeaderTemplate(options, "1", "Dados Pessoais")}>
               <div className="grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-                
                 <div className="col-12" style={{ gridColumn: 'span 2' }}>
                   <h3 style={{ color: '#002b5c', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem', marginBottom: '1rem' }}>1 - Dados Básicos</h3>
                 </div>
@@ -234,10 +230,9 @@ export default function AuxiliarRegistrationForm() {
               </div>
             </TabPanel>
 
-            {/* ABA 2 - ENDEREÇO (Inalterada) */}
+            {/* ABA 2 - ENDEREÇO */}
             <TabPanel headerTemplate={(options) => tabHeaderTemplate(options, "2", "Endereço")}>
               <div className="grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-                
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>CEP {naoSeiCep ? '' : '*'}</label>
                   <InputMask name="cep" value={data.cep} mask="99999-999" onChange={handleCepChange} disabled={naoSeiCep} placeholder="00000-000" />
@@ -250,42 +245,48 @@ export default function AuxiliarRegistrationForm() {
                   </div>
                 </div>
                 <div></div> 
-
                 <div style={{ gridColumn: 'span 2' }}>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Logradouro *</label>
                   <InputText name="logradouro" value={data.logradouro} onChange={handleChange} />
                 </div>
-                
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Número *</label>
                   <InputText name="numero" value={data.numero} onChange={handleChange} />
                 </div>
-
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Complemento</label>
                   <InputText name="complemento" value={data.complemento} onChange={handleChange} placeholder="Apto, Bloco, etc." />
                 </div>
-
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Bairro *</label>
                   <InputText name="bairro" value={data.bairro} onChange={handleChange} />
                 </div>
-                
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Cidade *</label>
                   <InputText name="cidade" value={data.cidade} onChange={handleChange} />
                 </div>
-                
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>UF *</label>
                   <Dropdown name="uf" value={data.uf} options={ufs} onChange={handleChange} placeholder="Selecione" />
                 </div>
-
               </div>
             </TabPanel>
 
-            {/* ABA 3 - DOCUMENTAÇÃO (Nova Lógica e Nome) */}
-            <TabPanel headerTemplate={(options) => tabHeaderTemplate(options, "3", "Documentação")}>
+            {/* ABA 3 - CREDENCIAIS */}
+            <TabPanel headerTemplate={(options) => tabHeaderTemplate(options, "3", "Credenciais")}>
+              <div className="grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', marginTop: '1rem' }}>
+                <div>
+                  <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>E-mail</label>
+                  <InputText name="email" value={data.email} disabled />
+                  <small style={{ color: '#64748b', display: 'block', marginTop: '0.5rem' }}>
+                    O e-mail de acesso foi informado no pré-cadastro e não pode ser alterado.
+                  </small>
+                </div>
+              </div>
+            </TabPanel>
+
+            {/* ABA 4 - DOCUMENTAÇÃO */}
+            <TabPanel headerTemplate={(options) => tabHeaderTemplate(options, "4", "Documentação")}>
               <div className="grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', marginTop: '1rem' }}>
                 <div>
                   <label className="font-bold block mb-2" style={{ color: '#002b5c' }}>Área(s) de Atuação Pretendida(s) *</label>
@@ -303,7 +304,6 @@ export default function AuxiliarRegistrationForm() {
                   </small>
                 </div>
 
-                {/* Renderização Dinâmica dos Anexos Baseada na Seleção */}
                 {data.areasAtuacao && data.areasAtuacao.length > 0 && (
                   <div>
                     <h4 style={{ color: '#002b5c', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: 0 }}>
@@ -324,40 +324,41 @@ export default function AuxiliarRegistrationForm() {
           </TabView>
 
           <div style={{ marginTop: '2rem', borderTop: '1px solid #dee2e6', paddingTop: '1.5rem' }}>
-            {activeIndex === 2 && (
-              <div className="flex align-items-center mb-4">
-                <Checkbox inputId="termos" checked={data.termos} onChange={(e) => setData({...data, termos: e.checked})} />
-                <label htmlFor="termos" className="ml-2" style={{ fontSize: '0.875rem' }}>Eu concordo com os termos e condições</label>
-              </div>
-            )}
-            
-            {/* Ajuste de Botões na Aba 3 para Salvar e Submeter */}
-            <div className="flex justify-content-end gap-2" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            <div className="flex justify-content-between align-items-center mt-4">
               <Button 
                 label="Voltar" 
-                severity="secondary" 
-                text 
-                onClick={() => activeIndex === 0 ? navigate('/') : setActiveIndex(activeIndex - 1)} 
+                icon="pi pi-arrow-left" 
+                className="p-button-text p-button-secondary" 
+                // CORREÇÃO AQUI: Retornar para o painel com o perfil correto de 'auxiliar' quando na aba 1
+                onClick={() => activeIndex === 0 ? navigate('/', { state: { role: 'auxiliar' } }) : setActiveIndex(activeIndex - 1)} 
               />
-              {activeIndex < 2 ? (
-                <Button label="Avançar" icon="pi pi-arrow-right" iconPos="right" className="siaj-btn-primary" onClick={() => setActiveIndex(activeIndex + 1)} />
-              ) : (
-                <>
+              <div className="flex gap-3">
+                {activeIndex < 3 ? (
                   <Button 
-                    label="Salvar" 
-                    icon="pi pi-save" 
-                    className="p-button-outlined siaj-btn-primary" 
-                    onClick={() => handleSave('Suas alterações foram salvas como rascunho com sucesso!')} 
+                    label="Avançar" 
+                    icon="pi pi-arrow-right" 
+                    iconPos="right" 
+                    className="p-button-primary siaj-btn-primary" 
+                    onClick={() => setActiveIndex(activeIndex + 1)} 
                   />
-                  <Button 
-                    label="Salvar e Submeter para Análise" 
-                    icon="pi pi-check" 
-                    disabled={!data.termos || !isEnderecoValid() || !data.areasAtuacao || data.areasAtuacao.length === 0} 
-                    className="siaj-btn-primary" 
-                    onClick={() => handleSave('Cadastro submetido para análise com sucesso!')} 
-                  />
-                </>
-              )}
+                ) : (
+                  <>
+                    <Button 
+                      label="Salvar" 
+                      icon="pi pi-save" 
+                      className="p-button-outlined p-button-secondary" 
+                      onClick={() => handleSave('Suas alterações foram salvas como rascunho com sucesso!')} 
+                    />
+                    <Button 
+                      label="Salvar e Submeter para Análise" 
+                      icon="pi pi-send" 
+                      disabled={!isEnderecoValid() || !data.areasAtuacao || data.areasAtuacao.length === 0} 
+                      className="p-button-primary siaj-btn-primary" 
+                      onClick={() => handleSave('Cadastro submetido para análise com sucesso!')} 
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
